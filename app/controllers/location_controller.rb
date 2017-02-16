@@ -1,4 +1,6 @@
 class LocationController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def create
     decoder = NMEAPlus::Decoder.new
     msg = decoder.parse(params[:nmea])
@@ -12,5 +14,9 @@ class LocationController < ApplicationController
     @loc.save
 
     render status: 200
+  end
+
+  def index
+    @locs = Location.all
   end
 end
