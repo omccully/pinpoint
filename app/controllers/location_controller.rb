@@ -18,5 +18,13 @@ class LocationController < ApplicationController
 
   def index
     @locs = Location.all
+    @last_loc = Location.last
+  end
+
+  def json
+    @loc = Location.last
+    coords = { latitude: @loc.latitude, longitude: @loc.longitude,
+        time: @loc.created_at.to_i }
+    render json: coords
   end
 end
