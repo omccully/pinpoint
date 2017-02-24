@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170216072145) do
+ActiveRecord::Schema.define(version: 20170223233132) do
+
+  create_table "devices", force: :cascade do |t|
+    t.string   "name"
+    t.string   "id_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "locations", force: :cascade do |t|
     t.float    "latitude"
@@ -18,6 +25,7 @@ ActiveRecord::Schema.define(version: 20170216072145) do
     t.text     "nmea"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "device_id"
   end
 
 end
