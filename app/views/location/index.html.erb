@@ -3,27 +3,31 @@
         height: 400px;
         width: 100%;
        }
-       .markerlabel {
-         font-weight:bold;
-         font-size:300%;
-       }
     </style>
     <h3>Pinpoint</h3>
     <div id="map"></div>
     <script>
-    initial_data = <%= @all_device_info.to_json.html_safe %>
     markers = {}
     locations = {}
     map = null;
-    function initMap() {
+    function initialize_map() {
+      var initial_data = <%= @all_device_info.to_json.html_safe %>
       var start_coords = {lat: <%= @last_loc.latitude %>,
         lng: <%= @last_loc.longitude %>};
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 10,
-        center: start_coords
+        center: start_coords,
+        mapTypeId: google.maps.MapTypeId.HYBRID
       });
-      map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
       add_markers(initial_data);
+
+      // TODO: instead of polling, keep connection open 
+      // and have server send data when new data comes in
+      window.setInterval(function() {
+        $.get('/location/json', function(data, status) {
+          add_markers(data);
+        }, "json");
+      }, 2000);
     }
 
     // sets the position of a marker that already exists
@@ -58,17 +62,9 @@
       }
     }
 
-    // TODO: instead of polling, keep connection open 
-    // and have server send data when new data comes in
-    window.setInterval(function() {
-      $.get('/location/json', function(data, status) {
-        add_markers(data);
-      }, "json");
-    }, 2000);
-
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initialize_map">
     </script>
     <p id='lastupdated'>
       Position last updated:
