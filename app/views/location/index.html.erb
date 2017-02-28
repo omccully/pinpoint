@@ -3,57 +3,66 @@
         height: 400px;
         width: 100%;
        }
+       .markerlabel {
+         font-weight:bold;
+         font-size:300%;
+       }
     </style>
     <h3>Pinpoint</h3>
     <div id="map"></div>
     <script>
+    initial_data = <%= @all_device_info.to_json.html_safe %>
     markers = {}
     locations = {}
-		// marker = 0;
-		map = 0;
+    map = null;
     function initMap() {
-      var uluru = {lat: <%= @last_loc.latitude %>,
+      var start_coords = {lat: <%= @last_loc.latitude %>,
         lng: <%= @last_loc.longitude %>};
       map = new google.maps.Map(document.getElementById('map'), {
         zoom: 10,
-        center: uluru
+        center: start_coords
       });
       map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
-      /* 
-      marker = new google.maps.Marker({
-        position: uluru,
-        map: map,
-        label: '<%= @last_loc.device.name %>'
-      }); */
+      add_markers(initial_data);
     }
-	  
-	  function set_marker(marker, latitude, longitude) {
+
+    // sets the position of a marker that already exists
+    function set_marker(marker, latitude, longitude) {
       marker.setPosition(new google.maps.LatLng(latitude, longitude));
     }
-    
-    window.setInterval(function() {
-      $.get('/location/json', function(data, status) {
-        locations = data;
-        for(var id_code in locations) {
-          if(locations.hasOwnProperty(id_code)) {
-            coords = locations[id_code];
-            if(markers.hasOwnProperty(id_code)) {
-              set_marker(markers[id_code], coords.latitude,
-                  coords.longitude);
-            } else {
-              markers[id_code] = new google.maps.Marker({
-                position: { lat: coords.latitude, 
-                            lng: coords.longitude },
-                map: map,
-                label: '<%= @last_loc.device.name %>'
-              });
-              //alert(typeof(markers[id_code]) + "asdf" + coords.latitude + " " + 
-               //   coords.longitude);
-            }
+
+    // add markers or change position of markers on the map
+    // based on the JSON data
+    function add_markers(data) {
+      locations = data;
+      for(var id_code in locations) {
+        if(locations.hasOwnProperty(id_code)) {
+          coords = locations[id_code];
+          if(markers.hasOwnProperty(id_code)) {
+            // marker already exists in the markers object
+            set_marker(markers[id_code], coords.latitude,
+                coords.longitude);
+          } else {
+            // marker must be created
+            markers[id_code] = new google.maps.Marker({
+              position: { lat: coords.latitude, 
+                          lng: coords.longitude },
+              map: map,
+              label: { 
+                text: '<%= @last_loc.device.name %>',
+                fontWeight: 'bold'
+              }
+            });
           }
         }
-        // set_marker(data.latitude, data.longitude);
-        // map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+      }
+    }
+
+    // TODO: instead of polling, keep connection open 
+    // and have server send data when new data comes in
+    window.setInterval(function() {
+      $.get('/location/json', function(data, status) {
+        add_markers(data);
       }, "json");
     }, 2000);
 
@@ -61,4 +70,8 @@
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initMap">
     </script>
-
+    <p id='lastupdated'>
+      Position last updated:
+      <%= @last_loc.created_at %>
+      (<%= ((Time.now - @last_loc.created_at) / 60).round(0) %> minutes ago)
+    </p>

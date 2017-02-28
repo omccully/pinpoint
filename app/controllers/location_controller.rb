@@ -1,4 +1,5 @@
 class LocationController < ApplicationController
+  include LocationHelper
   skip_before_action :verify_authenticity_token
 
   def create
@@ -27,25 +28,12 @@ class LocationController < ApplicationController
   end
 
   def index
+    @all_device_info = all_device_info
     @locs = Location.all
     @last_loc = Location.last
   end
 
   def json
-    hsh = { }
-
-    Device.all.each { |d|
-      loc = d.locations.last
-      hsh[d.id_code] = { latitude: loc.latitude, 
-                 longitude: loc.longitude,
-                 time: loc.created_at.to_i,
-                 name: d.name
-      }
-    }
-    # @loc = Location.last
-
-    #coords = { latitude: @loc.latitude, longitude: @loc.longitude,
-    #    time: @loc.created_at.to_i }
-    render json: hsh
+    render json: all_device_info
   end
 end
