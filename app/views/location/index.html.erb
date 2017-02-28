@@ -12,11 +12,11 @@
 		// marker = 0;
 		map = 0;
     function initMap() {
-      /* var uluru = {lat: <%= @last_loc.latitude %>,
-        lng: <%= @last_loc.longitude %>}; */
+      var uluru = {lat: <%= @last_loc.latitude %>,
+        lng: <%= @last_loc.longitude %>};
       map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 10
-        // center: uluru
+        zoom: 10,
+        center: uluru
       });
       map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
       /* 
@@ -30,7 +30,7 @@
 	  function set_marker(marker, latitude, longitude) {
       marker.setPosition(new google.maps.LatLng(latitude, longitude));
     }
-
+    
     window.setInterval(function() {
       $.get('/location/json', function(data, status) {
         locations = data;
@@ -47,13 +47,13 @@
                 map: map,
                 label: '<%= @last_loc.device.name %>'
               });
-              alert(typeof(markers[id_code]) + "asdf" + coords.latitude + " " + 
-                  coords.longitude);
+              //alert(typeof(markers[id_code]) + "asdf" + coords.latitude + " " + 
+               //   coords.longitude);
             }
           }
         }
-        set_marker(data.latitude, data.longitude);
-        map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+        // set_marker(data.latitude, data.longitude);
+        // map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
       }, "json");
     }, 2000);
 
