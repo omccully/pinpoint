@@ -1,12 +1,60 @@
+
+<div class="container-fluid">
+  <div class="row">
+    
     <style>
        #map {
         height: 400px;
         width: 100%;
        }
     </style>
-    <h3>Pinpoint</h3>
-    <div id="map"></div>
+    <div class="col-md-3">
+      <h4>Pinpoint Devices</h4>
+        <% @all_device_info.each do |id_code, info| %>
+          <div class="btn-group">
+            <button type="button" class="btn btn-default" onclick="center_on_id('<%= id_code %>')">
+              <%= info[:name] %>
+            </button>
+            <button type="button" class="btn btn-default">
+              <span class="glyphicon glyphicon-info-sign"></span>
+            </button>
+
+            <button type="button" class="btn btn-default" id="alert_button_<%= id_code %>"
+              onclick="alert_by_id('<%= id_code %>')">
+              <span class="glyphicon glyphicon-alert"></span>
+            </button>
+          </div>
+        <% end %>
+      </ul>
+    </div>
+    <div class="col-md-9">
+      <div id="map"></div>
+    </div>
     <script>
+    $(".btn").mouseup(function(){
+          $(this).blur();
+    });
+
+    alerted_ids = [];
+    window.setInterval(function() {
+      for(var id_code in alerted_ids) {
+        // blink the alert button
+        $("#alert_button_" + id_code).toggleClass("btn-danger").toggleClass("btn-default");
+      }
+
+
+    }, 500);
+
+    function alert_by_id(id_code) {
+      var index = alerted_ids.indexOf(id_code);
+      if(index > -1) { // device sent an unhandled alert
+        alerted_ids.splice(index, 1);
+      } else { // device hasn't sent an alert
+        alerted_ids.push(id_code);
+        //alert("pushed");
+      }
+    } 
+
     markers = {}
     locations = {}
     map = null;
@@ -62,6 +110,13 @@
       }
     }
 
+    function center_on_id(id_code) {
+      if(locations.hasOwnProperty(id_code)) {
+        var coords = locations[id_code];
+        map.setCenter(new google.maps.LatLng(coords.latitude, coords.longitude));
+      }
+    }
+
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initialize_map">
@@ -71,3 +126,5 @@
       <%= @last_loc.created_at %>
       (<%= ((Time.now - @last_loc.created_at) / 60).round(0) %> minutes ago)
     </p>
+  </div>
+</div>
