@@ -23,7 +23,9 @@
               onclick="alert_by_id('<%= id_code %>')">
               <span class="glyphicon glyphicon-alert"></span>
             </button>
+
           </div>
+          <br/>
         <% end %>
       </ul>
     </div>
@@ -37,21 +39,22 @@
 
     alerted_ids = [];
     window.setInterval(function() {
-      for(var id_code in alerted_ids) {
+      var arr_len = alerted_ids.length;
+
+      for(var i = 0; i < arr_len; i++) { 
+        id_code = alerted_ids[i];
         // blink the alert button
         $("#alert_button_" + id_code).toggleClass("btn-danger").toggleClass("btn-default");
       }
-
-
     }, 500);
 
     function alert_by_id(id_code) {
       var index = alerted_ids.indexOf(id_code);
       if(index > -1) { // device sent an unhandled alert
         alerted_ids.splice(index, 1);
+        $("#alert_button_" + id_code).removeClass("btn-danger").addClass("btn-default");
       } else { // device hasn't sent an alert
         alerted_ids.push(id_code);
-        //alert("pushed");
       }
     } 
 
@@ -101,7 +104,7 @@
                           lng: coords.longitude },
               map: map,
               label: { 
-                text: '<%= @last_loc.device.name %>',
+                text: coords.name,
                 fontWeight: 'bold'
               }
             });

@@ -30,7 +30,7 @@ class LocationController < ApplicationController
   def index
     @all_device_info = all_device_info
     @locs = Location.all
-    @last_loc = Location.last
+    @last_loc = Device.find(2).locations.last
   end
 
   def json
