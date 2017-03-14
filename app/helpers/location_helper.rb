@@ -3,7 +3,7 @@ module LocationHelper
     hsh = {}
     Device.all.each { |d|
       loc = d.locations.last
-      hsh[d.id_code] = { latitude: loc.latitude, 
+      hsh[d.id] = { latitude: loc.latitude, 
                  longitude: loc.longitude,
                  time: loc.created_at.to_i,
                  name: d.name
