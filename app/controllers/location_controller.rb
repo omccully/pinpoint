@@ -8,20 +8,27 @@ class LocationController < ApplicationController
       @device = Device.create(name: nil, id_code: params[:id_code])
     end
                          
-    decoder = NMEAPlus::Decoder.new
     msg = decoder.parse(params[:nmea])
-  
-    render nothing: true, status: 400 unless msg.checksum_ok?
 
-    #@loc = Location.new
-    #@loc.latitude = msg.latitude
-    #@loc.longitude = msg.longitude
-    #@loc.nmea = params[:nmea]
-    #@loc.save
-    unless msg.latitude.nil? or msg.longitude.nil?
-      @device.locations.create(latitude: msg.latitude,
-                             longitude: msg.longitude,
-                             nmea: params[:nmea])
+    if msg == "@PANIC"
+      @device.panic_signals.create
+    elsif msg.start_with "@PANIC"
+      tsp = /@PANIC_REP-(\d+)/.match(msg)[1].to_i
+      last_panic = @device.panic_signals.where('created_at >= :start',
+        start: Time.now - (tsp + 10)).last
+      if last_panic.nil?
+        @device.panic_signals.create(created_at: Time.now - tsp)
+      end
+    else
+      decoder = NMEAPlus::Decoder.new
+    
+      render nothing: true, status: 400 unless msg.checksum_ok?
+
+      unless msg.latitude.nil? or msg.longitude.nil?
+        @device.locations.create(latitude: msg.latitude,
+                               longitude: msg.longitude,
+                               nmea: params[:nmea])
+      end
     end
 
     render status: 200
