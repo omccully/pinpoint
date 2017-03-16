@@ -1,13 +1,17 @@
+<style>
+html, body, .container-fluid, .row, .col-md-9, #map {
+  height:100%;
+}
+
+#map {
+  width:100%;
+    position:relative;
+}
+</style>
 <audio id="alarm_sound" src="/sound/alarm.mp3" preload="auto"></audio>
 <div class="container-fluid">
   <div class="row">
     
-    <style>
-       #map {
-        height: 400px;
-        width: 100%;
-       }
-    </style>
     <div class="col-md-3">
       <h4>Pinpoint Devices</h4>
       <% @all_device_info.each do |id_code, info| %>
