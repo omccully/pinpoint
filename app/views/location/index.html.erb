@@ -27,6 +27,14 @@
         </div>
         <br/>
       <% end %>
+      <br/>
+      <p id='lastupdated'>
+        Position last updated:
+        <%= @last_loc.created_at %>
+        (<%= ((Time.now - @last_loc.created_at) / 60).round(0) %> minutes ago)
+      </p>
+      <br/>
+      <%= link_to "About the project", about_path %>
     </div>
     <div class="col-md-9">
       <div id="map"></div>
@@ -135,10 +143,5 @@
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initialize_map">
     </script>
-    <p id='lastupdated'>
-      Position last updated:
-      <%= @last_loc.created_at %>
-      (<%= ((Time.now - @last_loc.created_at) / 60).round(0) %> minutes ago)
-    </p>
   </div>
 </div>

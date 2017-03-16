@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  get 'about', controller: :about, action: :about
+
   post 'location/create', controller: :location, action: :create
   get 'location', controller: :location, action: :index
   get 'location/json', controller: :location, action: :json
