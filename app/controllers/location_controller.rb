@@ -10,10 +10,18 @@ class LocationController < ApplicationController
                          
     msg = decoder.parse(params[:nmea])
 
-    if msg == "@PANIC"
-      @device.panic_signals.create
-    elsif msg.start_with "@PANIC"
-      tsp = /@PANIC_REP-(\d+)/.match(msg)[1].to_i
+    # if msg == "@PANIC"
+     # @device.panic_signals.create
+    if msg.start_with "@PANIC"
+      match_data = /@PANIC-(.)-(\d+)/.match(msg)
+
+      if match_data.nil? 
+        render status: 400 # bad request
+        return
+      end
+
+      tsp = match_data[2].to_i
+
       last_panic = @device.panic_signals.where('created_at >= :start',
         start: Time.now - (tsp + 10)).last
       if last_panic.nil?
@@ -22,7 +30,10 @@ class LocationController < ApplicationController
     else
       decoder = NMEAPlus::Decoder.new
     
-      render nothing: true, status: 400 unless msg.checksum_ok?
+      unless msg.checksum_ok?
+        render nothing: true, status: 400 
+        return
+      end
 
       unless msg.latitude.nil? or msg.longitude.nil?
         @device.locations.create(latitude: msg.latitude,
