@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170223233132) do
+ActiveRecord::Schema.define(version: 20170316221357) do
 
   create_table "devices", force: :cascade do |t|
     t.string   "name"
@@ -26,6 +26,12 @@ ActiveRecord::Schema.define(version: 20170223233132) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer  "device_id"
+  end
+
+  create_table "panic_signals", force: :cascade do |t|
+    t.integer  "device_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

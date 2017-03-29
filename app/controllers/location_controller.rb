@@ -7,12 +7,13 @@ class LocationController < ApplicationController
     if @device.nil?
       @device = Device.create(name: nil, id_code: params[:id_code])
     end
-                         
-    msg = decoder.parse(params[:nmea])
 
+    #jrender plain: params.inspect
+                         
+    msg = params[:nmea]
     # if msg == "@PANIC"
      # @device.panic_signals.create
-    if msg.start_with "@PANIC"
+    if msg.start_with? "@PANIC"
       match_data = /@PANIC-(.)-(\d+)/.match(msg)
 
       if match_data.nil? 
@@ -29,16 +30,20 @@ class LocationController < ApplicationController
       end
     else
       decoder = NMEAPlus::Decoder.new
-    
-      unless msg.checksum_ok?
-        render nothing: true, status: 400 
-        return
-      end
+      begin
+        nmea = decoder.parse(msg)
 
-      unless msg.latitude.nil? or msg.longitude.nil?
-        @device.locations.create(latitude: msg.latitude,
-                               longitude: msg.longitude,
-                               nmea: params[:nmea])
+        unless nmea.checksum_ok?
+          render nothing: true, status: 400 
+          return
+        end
+
+        unless nmea.latitude.nil? or nmea.longitude.nil?
+          @device.locations.create(latitude: nmea.latitude,
+                                 longitude: nmea.longitude,
+                                 nmea: msg)
+        end
+      rescue
       end
     end
 

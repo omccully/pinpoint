@@ -4,7 +4,8 @@ module LocationHelper
     Device.all.each { |d|
       loc = d.locations.where.not(longitude: nil).
         where.not(latitude: nil).last
-      lp = d.locations.where(nmea: "@PANIC").last
+      next if loc.nil?
+      lp = d.panic_signals.last
       lpt = (lp.nil? ? 0 : lp.created_at.to_i)
       # loc = d.locations.last
       hsh[d.id] = { 

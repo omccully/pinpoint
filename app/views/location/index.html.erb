@@ -24,7 +24,7 @@ html, body, .container-fluid, .row, .col-md-9, #map {
           </button>
 
           <button type="button" class="btn btn-default" id="alert_button_<%= id_code %>"
-            onclick="alert_by_id('<%= id_code %>')">
+            onclick="ack_alert('<%= id_code %>')">
             <span class="glyphicon glyphicon-alert"></span>
           </button>
         </div>
@@ -43,6 +43,8 @@ html, body, .container-fluid, .row, .col-md-9, #map {
       <div id="map"></div>
     </div>
     <script>
+    // ignore alerts made before page has loaded
+    page_load_time = <%= Time.now.to_i %>;
 
     $(".btn").mouseup(function(){
           $(this).blur();
@@ -110,13 +112,35 @@ html, body, .container-fluid, .row, .col-md-9, #map {
       }
     }
 
+    function ack_alert(id) {
+      acked_alert_times[id] = locations[id]["last_panic_time"]; 
+      $("#alert_button_" + id_code).removeClass("btn-danger").addClass("btn-default");
+    }
+
     // alert system
     // will be modified later
+    acked_alert_times = []; 
     alerted_ids = [];
     window.setInterval(function() {
-      var arr_len = alerted_ids.length;
+      var alerting = false;
+      for(var id in locations) {
+        // alert(id);
+        /* if(locations.hasOwnProperty(id)) {
+          alert(locations[id]["last_panic_time"] + " > " +  page_load_time);
+        k} */
+        if(locations.hasOwnProperty(id) && 
+            locations[id]["last_panic_time"] > page_load_time) {
+          if(!acked_alert_times.hasOwnProperty(id) || 
+              acked_alert_times[id] < locations[id]["last_panic_time"]) {
+            alerting = true;
+
+            // blink the alert button
+            $("#alert_button_" + id).toggleClass("btn-danger").toggleClass("btn-default");
+          } 
+        }
+      }
       var alarm = $("#alarm_sound")[0];
-      if(arr_len > 0) {
+      if(alerting) {
         if(alarm.paused) {
           alarm.play();
         }
@@ -126,13 +150,9 @@ html, body, .container-fluid, .row, .col-md-9, #map {
           alarm.currentTime = 0;
         }
       }
-      for(var i = 0; i < arr_len; i++) { 
-        id_code = alerted_ids[i];
-        // blink the alert button
-        $("#alert_button_" + id_code).toggleClass("btn-danger").toggleClass("btn-default");
-      }
     }, 350);
 
+/* 
     function alert_by_id(id_code) {
       var index = alerted_ids.indexOf(id_code);
       if(index > -1) { // device sent an unhandled alert
@@ -141,7 +161,8 @@ html, body, .container-fluid, .row, .col-md-9, #map {
       } else { // device hasn't sent an alert
         alerted_ids.push(id_code);
       }
-    } 
+      } 
+      */
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAqO2ai1uwdMDcxrg4Foc3_OfQKghsIqk4&callback=initialize_map">
