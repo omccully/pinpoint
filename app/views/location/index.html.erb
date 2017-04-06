@@ -19,7 +19,7 @@ html, body, .container-fluid, .row, .col-md-9, #map {
             <%= info[:name] %>
           </button>
 
-          <button type="button" class="btn btn-default">
+          <button type="button" class="btn btn-default" onclick="show_info(<%= id_code %>)">
             <span class="glyphicon glyphicon-info-sign"></span>
           </button>
 
@@ -151,6 +151,33 @@ html, body, .container-fluid, .row, .col-md-9, #map {
         }
       }
     }, 350);
+
+    var ts_offset = <%= Time.now.to_i %> - (+ new Date());
+
+    function time_ago_str(server_time) {
+      var js_time_adjusted = (+ new Date()) + ts_offset;
+      var time_dif = (js_time_adjusted - server_time);
+      return time_dif + " seconds ago (" +
+        (time_dif / 3600).toFixed(1) + " hours ago)";
+    }
+
+    function show_info(id) {
+      // alert(JSON.stringify(locations[id]));
+      var dev = locations[id];
+      var ret = "";
+      ret += "Latitude: " + dev["latitude"] + "\n";
+      ret += "Longitude: " + dev["longitude"] + "\n";
+
+      ret += "Last online: " + time_ago_str(dev["time"]) + "\n";
+      ret += "Last panic signal: " + time_ago_str(dev["last_panic_time"]) + "\n";
+
+      var velocities = locations[id]['velocities'];
+
+      ret += "1 minute average: " + velocities[60] + " m/s\n";
+      ret += "5 minute average: " + velocities[300] + " m/s\n";
+      ret += "1 hour average: " + velocities[3600] + " m/s\n";
+      alert(ret);
+    }
 
 /* 
     function alert_by_id(id_code) {
