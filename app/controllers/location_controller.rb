@@ -34,7 +34,7 @@ class LocationController < ApplicationController
         nmea = decoder.parse(msg)
 
         unless nmea.checksum_ok?
-          render nothing: true, status: 400 
+          render plain: "Bad checksum for #{msg}", status: 400 
           return
         end
 

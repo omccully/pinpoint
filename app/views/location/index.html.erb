@@ -114,7 +114,7 @@ html, body, .container-fluid, .row, .col-md-9, #map {
 
     function ack_alert(id) {
       acked_alert_times[id] = locations[id]["last_panic_time"]; 
-      $("#alert_button_" + id_code).removeClass("btn-danger").addClass("btn-default");
+      $("#alert_button_" + id).removeClass("btn-danger").addClass("btn-default");
     }
 
     // alert system
@@ -132,7 +132,7 @@ html, body, .container-fluid, .row, .col-md-9, #map {
             locations[id]["last_panic_time"] > page_load_time) {
           if(!acked_alert_times.hasOwnProperty(id) || 
               acked_alert_times[id] < locations[id]["last_panic_time"]) {
-            alerting = true;
+            alerting = true
 
             // blink the alert button
             $("#alert_button_" + id).toggleClass("btn-danger").toggleClass("btn-default");
@@ -161,21 +161,26 @@ html, body, .container-fluid, .row, .col-md-9, #map {
         (time_dif / 3600).toFixed(1) + " hours ago)";
     }
 
+    function speed_str(mps) {
+      if(mps == null) mps = 0;
+      return mps + " m/s (" + (mps * 2.23694) + " mi/hr)";
+    }
+
     function show_info(id) {
       // alert(JSON.stringify(locations[id]));
       var dev = locations[id];
       var ret = "";
-      ret += "Latitude: " + dev["latitude"] + "\n";
-      ret += "Longitude: " + dev["longitude"] + "\n";
+      ret += "Latitude: " + dev["latitude"].toFixed(6) + "\n";
+      ret += "Longitude: " + dev["longitude"].toFixed(6) + "\n";
 
       ret += "Last online: " + time_ago_str(dev["time"]) + "\n";
       ret += "Last panic signal: " + time_ago_str(dev["last_panic_time"]) + "\n";
 
       var velocities = locations[id]['velocities'];
 
-      ret += "1 minute average: " + velocities[60] + " m/s\n";
-      ret += "5 minute average: " + velocities[300] + " m/s\n";
-      ret += "1 hour average: " + velocities[3600] + " m/s\n";
+      ret += "1 minute average: " + speed_str(velocities[60]) + "\n";
+      ret += "5 minute average: " + speed_str(velocities[300]) + "\n";
+      ret += "1 hour average: " + speed_str(velocities[3600]) + "\n";
       alert(ret);
     }
 
