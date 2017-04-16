@@ -117,6 +117,9 @@ html, body, .container-fluid, .row, .col-md-9, #map {
       $("#alert_button_" + id).removeClass("btn-danger").addClass("btn-default");
     }
 
+
+    alarm = $("#alarm_sound")[0];
+
     // alert system
     // will be modified later
     acked_alert_times = []; 
@@ -139,7 +142,6 @@ html, body, .container-fluid, .row, .col-md-9, #map {
           } 
         }
       }
-      var alarm = $("#alarm_sound")[0];
       if(alerting) {
         if(alarm.paused) {
           alarm.play();

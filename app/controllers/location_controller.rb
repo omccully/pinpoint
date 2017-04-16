@@ -31,19 +31,28 @@ class LocationController < ApplicationController
     else
       decoder = NMEAPlus::Decoder.new
       begin
+        # put in fake checksum if no checksum was sent
+        msg += '00' if msg.end_with? '*'
+
         nmea = decoder.parse(msg)
 
-        unless nmea.checksum_ok?
-          render plain: "Bad checksum for #{msg}", status: 400 
-          return
-        end
+        #unless nmea.checksum_ok?
+        #  render plain: "Bad checksum for #{msg}", status: 400 
+        #  return
+        #end
 
         unless nmea.latitude.nil? or nmea.longitude.nil?
           @device.locations.create(latitude: nmea.latitude,
                                  longitude: nmea.longitude,
                                  nmea: msg)
+        else
+          render status: 400
+          return
         end
       rescue
+        render plain: "rescued", status: 400
+        
+        return
       end
     end
 
