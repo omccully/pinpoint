@@ -1,6 +1,6 @@
 # Pinpoint Rails App
 
-Rails app that takes in GPS updates from a [Pinpoint PIC](https://github.com/omccully/pinpoint-pic) device that have been relayed by the [Pinpoint Relay](https://github.com/omccully/PinPointRelay).
+The purpose of this Rails app is to display the current location of the [Pinpoint PIC](https://github.com/omccully/pinpoint-pic) device. This Rails app receives position updates via its REST API from the [Pinpoint Relay](https://github.com/omccully/PinPointRelay) program. When the Pinpoint PIC device generates an alarm, the alarm is relayed to this Rails app to alert the user with a sound and a blinking red light on the web page.
 
 ## Related Repositories
 
